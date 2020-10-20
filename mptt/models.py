@@ -842,7 +842,7 @@ class MPTTModel(models.Model, metaclass=MPTTModelBase):
         self._tree_manager.move_node(self, target, position)
 
     def _is_saved(self, using=None):
-        if self.pk is None or self._mpttfield("tree_id") is None:
+        if self._state.adding or self._mpttfield("tree_id") is None:
             return False
         opts = self._meta
         if opts.pk.remote_field is None:
@@ -1140,7 +1140,7 @@ class MPTTModel(models.Model, metaclass=MPTTModelBase):
     delete.alters_data = True
 
     def _mptt_refresh(self):
-        if not self.pk:
+        if self._state.adding:
             return
         manager = type(self)._tree_manager
         opts = self._mptt_meta
